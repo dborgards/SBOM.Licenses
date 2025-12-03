@@ -47,7 +47,7 @@ public class LicenseDownloader
         var packageInfo = ParsePackageUrl(component.PackageUrl);
         if (packageInfo != null)
         {
-            var result = await TryDownloadFromNuGetAsync(packageInfo.Name, packageInfo.Version, component);
+            var result = await TryDownloadFromNuGetAsync(packageInfo.Value.Name, packageInfo.Value.Version, component);
             if (result.Success)
                 return result;
         }
