@@ -318,6 +318,31 @@ dotnet tool install --global --add-source ./bin/Release SBOM.Licenses
 
 The project uses standard .NET coding conventions.
 
+## Versioning and Releases
+
+This project uses semantic versioning with automated version calculation from git tags. See [VERSIONING.md](VERSIONING.md) for detailed information about:
+
+- How versioning works
+- Creating releases
+- CI/CD pipeline
+- Publishing to NuGet
+
+### Quick Release Guide
+
+To create a new release:
+
+```bash
+# Tag the release
+git tag v1.0.0
+git push origin v1.0.0
+
+# GitHub Actions will automatically:
+# 1. Build the project
+# 2. Create NuGet package
+# 3. Publish to NuGet.org
+# 4. Create GitHub release
+```
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
