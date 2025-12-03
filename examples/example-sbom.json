@@ -1,0 +1,160 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-12-03T00:00:00Z",
+    "tools": [
+      {
+        "name": "SBOM License Downloader",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "name": "Newtonsoft.Json",
+      "version": "13.0.3",
+      "purl": "pkg:nuget/Newtonsoft.Json@13.0.3",
+      "description": "Json.NET is a popular high-performance JSON framework for .NET",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "name": "MIT License",
+            "url": "https://licenses.nuget.org/MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "System.Text.Json",
+      "version": "9.0.0",
+      "purl": "pkg:nuget/System.Text.Json@9.0.0",
+      "description": "Provides high-performance and low-allocating types that serialize objects to JavaScript Object Notation (JSON)",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "name": "MIT License"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "Microsoft.Extensions.Logging",
+      "version": "9.0.0",
+      "purl": "pkg:nuget/Microsoft.Extensions.Logging@9.0.0",
+      "description": "Logging infrastructure default implementation for Microsoft.Extensions.Logging.",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "Microsoft.Extensions.Configuration",
+      "version": "9.0.0",
+      "purl": "pkg:nuget/Microsoft.Extensions.Configuration@9.0.0",
+      "description": "Provides types and interfaces for getting configuration data.",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "Serilog",
+      "version": "3.1.1",
+      "purl": "pkg:nuget/Serilog@3.1.1",
+      "description": "Simple .NET logging with fully-structured events",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "name": "Apache License 2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "Dapper",
+      "version": "2.1.28",
+      "purl": "pkg:nuget/Dapper@2.1.28",
+      "description": "A high performance Micro-ORM supporting SQL Server, MySQL, Sqlite, SqlCE, Firebird etc.",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "AutoMapper",
+      "version": "12.0.1",
+      "purl": "pkg:nuget/AutoMapper@12.0.1",
+      "description": "A convention-based object-object mapper",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "FluentValidation",
+      "version": "11.9.0",
+      "purl": "pkg:nuget/FluentValidation@11.9.0",
+      "description": "A popular .NET validation library for building strongly-typed validation rules",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "Polly",
+      "version": "8.2.1",
+      "purl": "pkg:nuget/Polly@8.2.1",
+      "description": "Polly is a .NET resilience and transient-fault-handling library",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "MediatR",
+      "version": "12.2.0",
+      "purl": "pkg:nuget/MediatR@12.2.0",
+      "description": "Simple mediator implementation in .NET",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
+    }
+  ]
+}
