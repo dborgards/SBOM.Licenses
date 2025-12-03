@@ -1,55 +1,78 @@
 # SBOM License Downloader
 
-Eine C# / .NET 10 Anwendung, die automatisch SBOM-Dateien (Software Bill of Materials) liest und die enthaltenen Lizenzen als Dateien aus den originalen Packages herunterlädt.
+A .NET tool that automatically reads SBOM (Software Bill of Materials) files and downloads the contained license files from the original packages.
 
 ## Features
 
-- ✅ Automatisches Lesen von SBOM-Dateien (CycloneDX und SPDX Format)
-- ✅ Download von Lizenzen direkt aus NuGet-Packages
-- ✅ Unterstützung für direkte Lizenz-URLs
-- ✅ Intelligente Dateinamen: `PackageName-Version.extension`
-- ✅ Konfigurierbarer Output-Ordner
-- ✅ Beibehaltung der originalen Dateiendung (oder `.txt` als Fallback)
-- ✅ Umfangreiches Logging
-- ✅ Konfiguration über `appsettings.json` oder Command-Line
+- ✅ Automatically reads SBOM files (CycloneDX and SPDX format support)
+- ✅ Downloads licenses directly from NuGet packages
+- ✅ Supports direct license URLs
+- ✅ Smart file naming: `PackageName-Version.extension`
+- ✅ Configurable output directory
+- ✅ Preserves original file extensions (or uses `.txt` as fallback)
+- ✅ Comprehensive logging
+- ✅ Configuration via `appsettings.json` or command-line arguments
+- ✅ Install globally as a .NET tool (like `cyclonedx`)
 
-## Anforderungen
+## Requirements
 
-- .NET 10.0 SDK oder höher
+- .NET 8.0 SDK or higher
 
 ## Installation
 
+### Install as .NET Global Tool (Recommended)
+
+Once published to NuGet.org:
+
 ```bash
-# Repository klonen
-git clone <repository-url>
+dotnet tool install --global SBOM.Licenses
+```
+
+### Install from Source
+
+```bash
+# Clone repository
+git clone https://github.com/dborgards/SBOM.Licenses
 cd SBOM.Licenses
 
-# Projekt bauen
+# Build and pack
 cd src/SBOM.Licenses
-dotnet build
+dotnet pack -c Release
 
-# Optional: Veröffentlichen für Deployment
-dotnet publish -c Release -o ./publish
+# Install locally
+dotnet tool install --global --add-source ./bin/Release SBOM.Licenses
 ```
 
-## Verwendung
-
-### Methode 1: Command-Line Argumente
+### Update the Tool
 
 ```bash
-# Einfachste Verwendung
-dotnet run --project src/SBOM.Licenses -- ./sbom.json
-
-# Mit benutzerdefiniertem Output-Ordner
-dotnet run --project src/SBOM.Licenses -- ./sbom.json ./my-licenses
-
-# Nach dem Publish
-./publish/SBOM.Licenses ./sbom.json ./licenses
+dotnet tool update --global SBOM.Licenses
 ```
 
-### Methode 2: Konfiguration über appsettings.json
+### Uninstall the Tool
 
-Bearbeiten Sie die `appsettings.json`:
+```bash
+dotnet tool uninstall --global SBOM.Licenses
+```
+
+## Usage
+
+### Basic Usage
+
+```bash
+# Download licenses from SBOM file
+sbom-licenses ./sbom.json
+
+# Specify custom output directory
+sbom-licenses ./sbom.json ./licenses
+
+# Use example SBOM
+sbom-licenses ./examples/example-sbom.json ./my-licenses
+```
+
+### Configuration File
+
+Create an `appsettings.json` in your working directory:
 
 ```json
 {
@@ -63,27 +86,27 @@ Bearbeiten Sie die `appsettings.json`:
 }
 ```
 
-Dann einfach ausführen:
+Then run without arguments:
 
 ```bash
-dotnet run --project src/SBOM.Licenses
+sbom-licenses
 ```
 
-## Konfigurationsoptionen
+## Configuration Options
 
-| Option | Beschreibung | Standard |
-|--------|--------------|----------|
-| `OutputDirectory` | Zielordner für die heruntergeladenen Lizenzen | `./licenses` |
-| `SbomPath` | Pfad zur SBOM-Datei | `./sbom.json` |
-| `CreateOutputDirectoryIfNotExists` | Ordner automatisch erstellen | `true` |
-| `OverwriteExistingFiles` | Vorhandene Dateien überschreiben | `false` |
-| `DefaultFileExtension` | Dateiendung für Lizenzen ohne Extension | `.txt` |
+| Option | Description | Default |
+|--------|-------------|---------|
+| `OutputDirectory` | Target directory for downloaded licenses | `./licenses` |
+| `SbomPath` | Path to SBOM file | `./sbom.json` |
+| `CreateOutputDirectoryIfNotExists` | Automatically create output directory | `true` |
+| `OverwriteExistingFiles` | Overwrite existing files | `false` |
+| `DefaultFileExtension` | File extension for licenses without extension | `.txt` |
 
 ## SBOM Format Support
 
-### CycloneDX (vollständig unterstützt)
+### CycloneDX (Fully Supported)
 
-Die Anwendung unterstützt CycloneDX SBOM-Dateien im JSON-Format:
+The application supports CycloneDX SBOM files in JSON format:
 
 ```json
 {
@@ -106,34 +129,34 @@ Die Anwendung unterstützt CycloneDX SBOM-Dateien im JSON-Format:
 }
 ```
 
-### SPDX (in Entwicklung)
+### SPDX (In Development)
 
-SPDX-Unterstützung ist in Arbeit.
+SPDX format support is under development.
 
-## Dateinamens-Konvention
+## File Naming Convention
 
-Die heruntergeladenen Lizenzen werden nach folgendem Muster benannt:
+Downloaded licenses are named according to this pattern:
 
 ```
 {PackageName}-{Version}.{OriginalExtension}
 ```
 
-Beispiele:
+Examples:
 - `Newtonsoft.Json-13.0.3.txt`
-- `System.Text.Json-10.0.0.md`
-- `Microsoft.Extensions.Logging-10.0.0.txt`
+- `System.Text.Json-8.0.0.md`
+- `Microsoft.Extensions.Logging-8.0.0.txt`
 
-Falls die Originaldatei keine Endung hat, wird `.txt` verwendet (konfigurierbar).
+If the original file has no extension, `.txt` is used (configurable).
 
-## Download-Strategien
+## Download Strategies
 
-Die Anwendung versucht Lizenzen in folgender Reihenfolge zu finden:
+The application attempts to find licenses in the following order:
 
-1. **Direkte Lizenz-URL** - Falls in der SBOM eine Lizenz-URL angegeben ist
-2. **NuGet Package (via PURL)** - Extrahiert die Lizenz aus dem NuGet-Package (.nupkg)
-3. **NuGet Package (via Name)** - Versucht das Package über Name und Version zu finden
+1. **Direct License URL** - If a license URL is specified in the SBOM
+2. **NuGet Package (via PURL)** - Extracts the license from the NuGet package (.nupkg)
+3. **NuGet Package (via Name)** - Attempts to find the package by name and version
 
-Innerhalb der NuGet-Packages sucht die Anwendung nach folgenden Dateien:
+Within NuGet packages, the application searches for the following files:
 - `LICENSE`
 - `LICENSE.txt`
 - `LICENSE.md`
@@ -144,7 +167,7 @@ Innerhalb der NuGet-Packages sucht die Anwendung nach folgenden Dateien:
 - `LICENSE-MIT`
 - `LICENSE-APACHE`
 
-## Beispiel-Output
+## Example Output
 
 ```
 SBOM License Downloader v1.0
@@ -184,7 +207,7 @@ Process completed with errors
 
 ## Logging
 
-Die Anwendung verwendet Microsoft.Extensions.Logging mit konfigurierbaren Log-Levels in `appsettings.json`:
+The application uses Microsoft.Extensions.Logging with configurable log levels in `appsettings.json`:
 
 ```json
 {
@@ -198,15 +221,15 @@ Die Anwendung verwendet Microsoft.Extensions.Logging mit konfigurierbaren Log-Le
 }
 ```
 
-Log-Levels:
-- `Trace` - Sehr detailliert, alle Details
-- `Debug` - Debug-Informationen
-- `Information` - Standard, wichtige Informationen
-- `Warning` - Warnungen
-- `Error` - Fehler
-- `Critical` - Kritische Fehler
+Log Levels:
+- `Trace` - Very detailed, all details
+- `Debug` - Debug information
+- `Information` - Standard, important information
+- `Warning` - Warnings
+- `Error` - Errors
+- `Critical` - Critical errors
 
-## Projektstruktur
+## Project Structure
 
 ```
 SBOM.Licenses/
@@ -231,75 +254,88 @@ SBOM.Licenses/
 └── README.md
 ```
 
-## Beispiel SBOM generieren
+## Generating SBOM Files
 
-Um eine SBOM-Datei für Ihr .NET-Projekt zu generieren, können Sie folgende Tools verwenden:
+To generate an SBOM file for your .NET project, you can use the following tools:
 
-### Mit dotnet CLI (ab .NET 7):
+### Using dotnet CLI (.NET 7+):
 
 ```bash
-# SBOM während des Builds generieren
+# Generate SBOM during build
 dotnet build /p:GenerateSBOM=true
 
-# Die SBOM wird in obj/Debug/net10.0/sbom/ gespeichert
+# SBOM will be saved in obj/Debug/net8.0/sbom/
 ```
 
-### Mit CycloneDX Tool:
+### Using CycloneDX Tool:
 
 ```bash
-# Tool installieren
+# Install tool
 dotnet tool install --global CycloneDX
 
-# SBOM generieren
+# Generate SBOM
 dotnet CycloneDX ./YourProject.csproj -o ./sbom.json
 ```
 
-## Fehlerbehebung
+## Troubleshooting
 
 ### "SBOM file not found"
-- Prüfen Sie den Pfad zur SBOM-Datei
-- Verwenden Sie absolute oder relative Pfade korrekt
+- Check the path to your SBOM file
+- Use absolute or relative paths correctly
 
 ### "Failed to download from NuGet"
-- Prüfen Sie die Internetverbindung
-- Manche Packages haben keine Lizenz-Datei im Package
-- Alte Package-Versionen könnten nicht mehr verfügbar sein
+- Check your internet connection
+- Some packages don't include a license file in the package
+- Older package versions might not be available anymore
 
 ### "No license file found in NuGet package"
-- Das Package enthält keine Standard-Lizenzdatei
-- Versuchen Sie, eine Lizenz-URL im SBOM anzugeben
+- The package doesn't contain a standard license file
+- Try specifying a license URL in the SBOM
 
-## Entwicklung
+## Development
 
-### Tests ausführen
+### Running Tests
 
 ```bash
 cd src/SBOM.Licenses
 dotnet test
 ```
 
-### Code-Stil
+### Building from Source
 
-Das Projekt verwendet Standard .NET Coding Conventions.
+```bash
+# Build the project
+dotnet build
 
-## Lizenz
+# Pack as NuGet package
+dotnet pack -c Release
 
-Dieses Projekt ist unter der MIT-Lizenz lizenziert. Siehe die [LICENSE](LICENSE) Datei für Details.
+# Install locally for testing
+dotnet tool install --global --add-source ./bin/Release SBOM.Licenses
+```
 
-## Beiträge
+### Code Style
 
-Beiträge sind willkommen! Bitte erstellen Sie einen Pull Request oder öffnen Sie ein Issue.
+The project uses standard .NET coding conventions.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+Contributions are welcome! Please create a pull request or open an issue.
 
 ## Roadmap
 
-- [ ] SPDX Format vollständig unterstützen
-- [ ] Support für weitere Package-Quellen (npm, Maven, PyPI)
-- [ ] GUI-Version
-- [ ] Docker-Container
-- [ ] Parallele Downloads mit konfigurierbarer Concurrency
-- [ ] Caching von bereits heruntergeladenen Lizenzen
-- [ ] Export-Report (CSV, JSON, HTML)
+- [ ] Full SPDX format support
+- [ ] Support for additional package sources (npm, Maven, PyPI)
+- [ ] GUI version
+- [ ] Docker container
+- [ ] Parallel downloads with configurable concurrency
+- [ ] Caching of previously downloaded licenses
+- [ ] Export reports (CSV, JSON, HTML)
 
 ## Support
 
-Bei Fragen oder Problemen öffnen Sie bitte ein Issue auf GitHub.
+For questions or issues, please open an issue on GitHub.
