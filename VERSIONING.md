@@ -106,7 +106,7 @@ dotnet build src/SBOM.Licenses/SBOM.Licenses.csproj --configuration Release
 dotnet pack src/SBOM.Licenses/SBOM.Licenses.csproj --configuration Release --output ./artifacts
 
 # Check the version
-dotnet msbuild src/SBOM.Licenses/SBOM.Licenses.csproj -getProperty:Version -t:NoTargets
+dotnet msbuild src/SBOM.Licenses/SBOM.Licenses.csproj -getProperty:Version -nologo
 ```
 
 ## Version Tags Best Practices

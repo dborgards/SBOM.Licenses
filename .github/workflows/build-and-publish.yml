@@ -36,7 +36,7 @@ jobs:
       run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
 
     - name: Display version
-      run: dotnet msbuild ${{ env.PROJECT_PATH }} -getProperty:Version -t:NoTargets
+      run: dotnet msbuild ${{ env.PROJECT_PATH }} -getProperty:Version -getProperty:PackageVersion -nologo
 
     - name: Pack
       run: dotnet pack ${{ env.PROJECT_PATH }} --configuration Release --no-build --output ./artifacts
