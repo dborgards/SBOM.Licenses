@@ -1,0 +1,108 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "Example SPDX SBOM",
+  "documentNamespace": "https://example.org/sbom/example-1.0.0",
+  "creationInfo": {
+    "created": "2024-01-15T10:00:00Z",
+    "creators": [
+      "Tool: example-sbom-generator"
+    ]
+  },
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-Newtonsoft.Json",
+      "name": "Newtonsoft.Json",
+      "versionInfo": "13.0.3",
+      "downloadLocation": "https://www.nuget.org/packages/Newtonsoft.Json/13.0.3",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright (c) 2007 James Newton-King",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Newtonsoft.Json@13.0.3"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Microsoft.Extensions.Logging",
+      "name": "Microsoft.Extensions.Logging",
+      "versionInfo": "8.0.0",
+      "downloadLocation": "https://github.com/dotnet/runtime",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright (c) .NET Foundation",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Microsoft.Extensions.Logging@8.0.0"
+        },
+        {
+          "referenceCategory": "PERSISTENT-ID",
+          "referenceType": "gitoid",
+          "referenceLocator": "https://github.com/dotnet/runtime"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Serilog",
+      "name": "Serilog",
+      "versionInfo": "3.1.1",
+      "downloadLocation": "https://github.com/serilog/serilog",
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0",
+      "copyrightText": "Copyright 2013-2024 Serilog Contributors",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Serilog@3.1.1"
+        },
+        {
+          "referenceCategory": "PERSISTENT-ID",
+          "referenceType": "gitoid",
+          "referenceLocator": "https://github.com/serilog/serilog"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-Package-FluentValidation",
+      "name": "FluentValidation",
+      "versionInfo": "11.9.0",
+      "downloadLocation": "https://github.com/FluentValidation/FluentValidation",
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0",
+      "copyrightText": "Copyright Jeremy Skinner and contributors",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/FluentValidation@11.9.0"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-Package-AutoMapper",
+      "name": "AutoMapper",
+      "versionInfo": "12.0.1",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT",
+      "licenseInfoFromFiles": [
+        "MIT"
+      ],
+      "copyrightText": "Copyright (c) AutoMapper",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/AutoMapper@12.0.1"
+        }
+      ]
+    }
+  ]
+}

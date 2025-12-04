@@ -2,6 +2,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SBOM.Licenses.Models;
 using SBOM.Licenses.Models.CycloneDx;
+using SBOM.Licenses.Models.Spdx;
 
 namespace SBOM.Licenses.Services;
 
@@ -127,9 +128,97 @@ public class SbomReader
 
     private Task<List<SbomComponent>> ParseSpdxAsync(string jsonContent)
     {
-        // SPDX parsing implementation
-        // For now, return empty list with a warning
-        _logger.LogWarning("SPDX format parsing not yet fully implemented");
-        return Task.FromResult(new List<SbomComponent>());
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
+        var document = JsonSerializer.Deserialize<SpdxDocument>(jsonContent, options);
+
+        if (document?.Packages == null)
+        {
+            _logger.LogWarning("No packages found in SPDX SBOM");
+            return Task.FromResult(new List<SbomComponent>());
+        }
+
+        var components = new List<SbomComponent>();
+
+        foreach (var package in document.Packages)
+        {
+            if (string.IsNullOrEmpty(package.Name))
+                continue;
+
+            var sbomComponent = new SbomComponent
+            {
+                Name = package.Name,
+                Version = package.VersionInfo ?? "unknown"
+            };
+
+            // Extract license information
+            // SPDX has multiple license fields, we prioritize licenseConcluded, then licenseDeclared
+            if (!string.IsNullOrEmpty(package.LicenseConcluded) &&
+                !package.LicenseConcluded.Equals("NOASSERTION", StringComparison.OrdinalIgnoreCase) &&
+                !package.LicenseConcluded.Equals("NONE", StringComparison.OrdinalIgnoreCase))
+            {
+                sbomComponent.Licenses.Add(package.LicenseConcluded);
+            }
+            else if (!string.IsNullOrEmpty(package.LicenseDeclared) &&
+                     !package.LicenseDeclared.Equals("NOASSERTION", StringComparison.OrdinalIgnoreCase) &&
+                     !package.LicenseDeclared.Equals("NONE", StringComparison.OrdinalIgnoreCase))
+            {
+                sbomComponent.Licenses.Add(package.LicenseDeclared);
+            }
+
+            // Also add licenses from files if no other license was found
+            if (sbomComponent.Licenses.Count == 0 && package.LicenseInfoFromFiles != null)
+            {
+                foreach (var license in package.LicenseInfoFromFiles)
+                {
+                    if (!string.IsNullOrEmpty(license) &&
+                        !license.Equals("NOASSERTION", StringComparison.OrdinalIgnoreCase) &&
+                        !license.Equals("NONE", StringComparison.OrdinalIgnoreCase))
+                    {
+                        sbomComponent.Licenses.Add(license);
+                    }
+                }
+            }
+
+            // Extract package URL and repository URL from external references
+            if (package.ExternalRefs != null)
+            {
+                // Look for package-manager reference (purl)
+                var purlRef = package.ExternalRefs
+                    .FirstOrDefault(r => r.ReferenceType?.Equals("purl", StringComparison.OrdinalIgnoreCase) == true);
+
+                if (purlRef?.ReferenceLocator != null)
+                {
+                    sbomComponent.PackageUrl = purlRef.ReferenceLocator;
+                }
+
+                // Look for VCS/repository URL
+                var vcsRef = package.ExternalRefs
+                    .FirstOrDefault(r => r.ReferenceCategory?.Equals("PERSISTENT-ID", StringComparison.OrdinalIgnoreCase) == true &&
+                                        (r.ReferenceType?.Contains("git", StringComparison.OrdinalIgnoreCase) == true ||
+                                         r.ReferenceType?.Contains("vcs", StringComparison.OrdinalIgnoreCase) == true));
+
+                if (vcsRef?.ReferenceLocator != null)
+                {
+                    sbomComponent.RepositoryUrl = vcsRef.ReferenceLocator;
+                }
+                // Alternative: check downloadLocation for git URLs
+                else if (!string.IsNullOrEmpty(package.DownloadLocation) &&
+                        (package.DownloadLocation.Contains("github.com") ||
+                         package.DownloadLocation.Contains("gitlab.com") ||
+                         package.DownloadLocation.Contains(".git")))
+                {
+                    sbomComponent.RepositoryUrl = package.DownloadLocation;
+                }
+            }
+
+            components.Add(sbomComponent);
+        }
+
+        _logger.LogInformation("Parsed {Count} packages from SPDX SBOM", components.Count);
+        return Task.FromResult(components);
     }
 }
