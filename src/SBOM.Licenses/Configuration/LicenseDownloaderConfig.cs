@@ -31,4 +31,11 @@ public class LicenseDownloaderConfig
     /// Default file extension for license files without extension
     /// </summary>
     public string DefaultFileExtension { get; set; } = ".txt";
+
+    /// <summary>
+    /// List of package name patterns to exclude from license download.
+    /// Supports wildcard patterns (e.g., "Microsoft.*", "System.*").
+    /// Packages matching these patterns will be skipped.
+    /// </summary>
+    public List<string> ExcludedPackagePatterns { get; set; } = new();
 }
