@@ -1,3 +1,21 @@
+# [1.1.0](https://github.com/dborgards/SBOM.Licenses/compare/v1.0.0...v1.1.0) (2025-12-04)
+
+
+### Bug Fixes
+
+* add CultureInvariant to regex pattern matching ([de147cf](https://github.com/dborgards/SBOM.Licenses/commit/de147cfcf012f342d4925fa8cf4094726240cba9))
+
+
+### Features
+
+* add configurable package exclusion patterns ([45fe48e](https://github.com/dborgards/SBOM.Licenses/commit/45fe48ed4d49283de449acd55c8cecfe199c6e03))
+
+
+### Performance Improvements
+
+* optimize package exclusion performance ([03027a2](https://github.com/dborgards/SBOM.Licenses/commit/03027a216ac399f3d46ca08032565e36a2121756))
+* reduce memory allocation in package filtering ([3924b54](https://github.com/dborgards/SBOM.Licenses/commit/3924b54446cbc307c98bf1ed37fddd34f179ed92))
+
 # 1.0.0 (2025-12-04)
 
 
