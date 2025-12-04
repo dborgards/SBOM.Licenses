@@ -75,6 +75,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        PROJECT_PATH: ${{ env.PROJECT_PATH }}
       run: npx semantic-release
 
     - name: Publish to NuGet
