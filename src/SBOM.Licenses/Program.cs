@@ -61,11 +61,15 @@ class Program
                 return 1;
             }
 
+            // GitHub token from config or environment variable
+            var githubToken = config.GitHubToken ?? Environment.GetEnvironmentVariable("GITHUB_TOKEN");
+
             logger.LogInformation("Configuration:");
             logger.LogInformation("  SBOM Path: {SbomPath}", config.SbomPath);
             logger.LogInformation("  Output Directory: {OutputDirectory}", config.OutputDirectory);
             logger.LogInformation("  Default Extension: {Extension}", config.DefaultFileExtension);
             logger.LogInformation("  Overwrite Existing: {Overwrite}", config.OverwriteExistingFiles);
+            logger.LogInformation("  GitHub API: {Status}", !string.IsNullOrEmpty(githubToken) ? "Enabled (with token)" : "Enabled (unauthenticated)");
             if (config.ExcludedPackagePatterns.Count > 0)
             {
                 logger.LogInformation("  Excluded Patterns: {Patterns}", string.Join(", ", config.ExcludedPackagePatterns));
@@ -77,9 +81,18 @@ class Program
             httpClient.DefaultRequestHeaders.Add("User-Agent", "SBOM-License-Downloader/1.0");
 
             var sbomReader = new SbomReader(loggerFactory.CreateLogger<SbomReader>());
+
+            // Create GitHub service (separate HttpClient to avoid conflicting headers)
+            var githubHttpClient = new HttpClient();
+            var githubService = new GitHubLicenseService(
+                loggerFactory.CreateLogger<GitHubLicenseService>(),
+                githubHttpClient,
+                githubToken);
+
             var licenseDownloader = new LicenseDownloader(
                 loggerFactory.CreateLogger<LicenseDownloader>(),
-                httpClient);
+                httpClient,
+                githubService);
             var fileManager = new LicenseFileManager(
                 loggerFactory.CreateLogger<LicenseFileManager>(),
                 config.OutputDirectory,

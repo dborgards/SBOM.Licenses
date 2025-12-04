@@ -97,7 +97,7 @@ public class SbomReader
                 }
             }
 
-            // Look for license URL in external references
+            // Look for license URL and repository URL in external references
             if (component.ExternalReferences != null)
             {
                 var licenseRef = component.ExternalReferences
@@ -106,6 +106,15 @@ public class SbomReader
                 if (licenseRef?.Url != null)
                 {
                     sbomComponent.LicenseUrl = licenseRef.Url;
+                }
+
+                // Extract VCS (repository) URL
+                var vcsRef = component.ExternalReferences
+                    .FirstOrDefault(r => r.Type?.Equals("vcs", StringComparison.OrdinalIgnoreCase) == true);
+
+                if (vcsRef?.Url != null)
+                {
+                    sbomComponent.RepositoryUrl = vcsRef.Url;
                 }
             }
 

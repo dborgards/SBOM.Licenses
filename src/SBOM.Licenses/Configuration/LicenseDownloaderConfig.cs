@@ -38,4 +38,11 @@ public class LicenseDownloaderConfig
     /// Packages matching these patterns will be skipped.
     /// </summary>
     public List<string> ExcludedPackagePatterns { get; set; } = new();
+
+    /// <summary>
+    /// GitHub Personal Access Token for API requests.
+    /// Optional but recommended to increase rate limits (5000/hour vs 60/hour).
+    /// Can also be provided via environment variable GITHUB_TOKEN.
+    /// </summary>
+    public string? GitHubToken { get; set; }
 }

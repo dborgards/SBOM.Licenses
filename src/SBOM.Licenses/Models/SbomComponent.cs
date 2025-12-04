@@ -10,6 +10,7 @@ public class SbomComponent
     public List<string> Licenses { get; set; } = new();
     public string? LicenseUrl { get; set; }
     public string? PackageUrl { get; set; }
+    public string? RepositoryUrl { get; set; }
 
     public override string ToString()
     {

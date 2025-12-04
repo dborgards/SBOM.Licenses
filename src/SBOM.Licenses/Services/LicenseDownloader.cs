@@ -6,12 +6,13 @@ using SBOM.Licenses.Models;
 namespace SBOM.Licenses.Services;
 
 /// <summary>
-/// Downloads license files from NuGet packages
+/// Downloads license files from various sources (GitHub, direct URLs, NuGet packages)
 /// </summary>
 public class LicenseDownloader
 {
     private readonly ILogger<LicenseDownloader> _logger;
     private readonly HttpClient _httpClient;
+    private readonly GitHubLicenseService? _githubService;
     private static readonly string[] LicenseFileNames = new[]
     {
         "LICENSE", "LICENSE.txt", "LICENSE.md", "License.txt", "license.txt",
@@ -20,10 +21,14 @@ public class LicenseDownloader
         "LICENSE-MIT", "LICENSE-APACHE"
     };
 
-    public LicenseDownloader(ILogger<LicenseDownloader> logger, HttpClient httpClient)
+    public LicenseDownloader(
+        ILogger<LicenseDownloader> logger,
+        HttpClient httpClient,
+        GitHubLicenseService? githubService = null)
     {
         _logger = logger;
         _httpClient = httpClient;
+        _githubService = githubService;
     }
 
     /// <summary>
@@ -35,7 +40,15 @@ public class LicenseDownloader
 
         // Try different strategies to get the license
 
-        // Strategy 1: Direct license URL
+        // Strategy 1: GitHub API (if repository URL is available and GitHub service is configured)
+        if (_githubService != null && !string.IsNullOrEmpty(component.RepositoryUrl))
+        {
+            var result = await TryDownloadFromGitHubAsync(component.RepositoryUrl, component);
+            if (result.Success)
+                return result;
+        }
+
+        // Strategy 2: Direct license URL
         if (!string.IsNullOrEmpty(component.LicenseUrl))
         {
             var result = await TryDownloadFromUrlAsync(component.LicenseUrl, component);
@@ -43,7 +56,7 @@ public class LicenseDownloader
                 return result;
         }
 
-        // Strategy 2: Extract from NuGet package
+        // Strategy 3: Extract from NuGet package
         var packageInfo = ParsePackageUrl(component.PackageUrl);
         if (packageInfo != null)
         {
@@ -52,7 +65,7 @@ public class LicenseDownloader
                 return result;
         }
 
-        // Strategy 3: Try NuGet with component name and version
+        // Strategy 4: Try NuGet with component name and version
         var nugetResult = await TryDownloadFromNuGetAsync(component.Name, component.Version, component);
         if (nugetResult.Success)
             return nugetResult;
@@ -64,6 +77,39 @@ public class LicenseDownloader
             Component = component,
             ErrorMessage = "No license file found"
         };
+    }
+
+    private async Task<LicenseDownloadResult> TryDownloadFromGitHubAsync(string repositoryUrl, SbomComponent component)
+    {
+        try
+        {
+            _logger.LogDebug("Trying to download license from GitHub: {RepositoryUrl}", repositoryUrl);
+
+            var licenseResult = await _githubService!.GetLicenseAsync(repositoryUrl);
+            if (licenseResult == null)
+            {
+                _logger.LogDebug("Could not retrieve license from GitHub for {RepositoryUrl}", repositoryUrl);
+                return new LicenseDownloadResult { Success = false, Component = component };
+            }
+
+            _logger.LogInformation(
+                "Successfully downloaded license from GitHub for {Component} (SPDX: {SpdxId})",
+                component,
+                licenseResult.SpdxId);
+
+            return new LicenseDownloadResult
+            {
+                Success = true,
+                Component = component,
+                Content = licenseResult.Content,
+                OriginalFileName = licenseResult.FileName
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Error downloading from GitHub: {RepositoryUrl}", repositoryUrl);
+            return new LicenseDownloadResult { Success = false, Component = component };
+        }
     }
 
     private async Task<LicenseDownloadResult> TryDownloadFromUrlAsync(string url, SbomComponent component)
