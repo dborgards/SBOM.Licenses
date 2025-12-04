@@ -66,6 +66,10 @@ class Program
             logger.LogInformation("  Output Directory: {OutputDirectory}", config.OutputDirectory);
             logger.LogInformation("  Default Extension: {Extension}", config.DefaultFileExtension);
             logger.LogInformation("  Overwrite Existing: {Overwrite}", config.OverwriteExistingFiles);
+            if (config.ExcludedPackagePatterns.Count > 0)
+            {
+                logger.LogInformation("  Excluded Patterns: {Patterns}", string.Join(", ", config.ExcludedPackagePatterns));
+            }
             logger.LogInformation("");
 
             // Create services
@@ -82,11 +86,13 @@ class Program
                 config.DefaultFileExtension,
                 config.CreateOutputDirectoryIfNotExists,
                 config.OverwriteExistingFiles);
+            var exclusionService = new PackageExclusionService(config);
             var orchestrator = new LicenseDownloadOrchestrator(
                 loggerFactory.CreateLogger<LicenseDownloadOrchestrator>(),
                 sbomReader,
                 licenseDownloader,
-                fileManager);
+                fileManager,
+                exclusionService);
 
             // Execute
             var summary = await orchestrator.ExecuteAsync(config.SbomPath);
@@ -96,6 +102,7 @@ class Program
             logger.LogInformation("=====================================");
             logger.LogInformation("Summary:");
             logger.LogInformation("  Total Components: {Total}", summary.TotalComponents);
+            logger.LogInformation("  Excluded Packages: {Excluded}", summary.ExcludedPackages);
             logger.LogInformation("  Successful Downloads: {Success}", summary.SuccessfulDownloads);
             logger.LogInformation("  Failed Downloads: {Failed}", summary.FailedDownloads);
             logger.LogInformation("  Output Directory: {Directory}", summary.OutputDirectory);

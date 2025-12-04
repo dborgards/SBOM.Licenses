@@ -17,6 +17,7 @@ SBOM.Licenses/
 │       │   ├── SbomReader.cs
 │       │   ├── LicenseDownloader.cs
 │       │   ├── LicenseFileManager.cs
+│       │   ├── PackageExclusionService.cs
 │       │   └── LicenseDownloadOrchestrator.cs
 │       ├── Program.cs
 │       ├── appsettings.json

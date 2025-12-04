@@ -11,17 +11,20 @@ public class LicenseDownloadOrchestrator
     private readonly SbomReader _sbomReader;
     private readonly LicenseDownloader _licenseDownloader;
     private readonly LicenseFileManager _fileManager;
+    private readonly PackageExclusionService _exclusionService;
 
     public LicenseDownloadOrchestrator(
         ILogger<LicenseDownloadOrchestrator> logger,
         SbomReader sbomReader,
         LicenseDownloader licenseDownloader,
-        LicenseFileManager fileManager)
+        LicenseFileManager fileManager,
+        PackageExclusionService exclusionService)
     {
         _logger = logger;
         _sbomReader = sbomReader;
         _licenseDownloader = licenseDownloader;
         _fileManager = fileManager;
+        _exclusionService = exclusionService;
     }
 
     /// <summary>
@@ -38,16 +41,48 @@ public class LicenseDownloadOrchestrator
 
             // Step 1: Read SBOM
             _logger.LogInformation("Step 1: Reading SBOM...");
-            var components = await _sbomReader.ReadSbomAsync(sbomPath);
-            summary.TotalComponents = components.Count;
+            var allComponents = await _sbomReader.ReadSbomAsync(sbomPath);
+            summary.TotalComponents = allComponents.Count;
 
-            if (components.Count == 0)
+            if (allComponents.Count == 0)
             {
                 _logger.LogWarning("No components found in SBOM");
                 return summary;
             }
 
-            _logger.LogInformation("Found {Count} components in SBOM", components.Count);
+            _logger.LogInformation("Found {Count} components in SBOM", allComponents.Count);
+
+            // Filter out excluded packages in a single pass
+            var components = new List<Models.SbomComponent>();
+            var excludedCount = 0;
+
+            foreach (var component in allComponents)
+            {
+                if (_exclusionService.IsExcluded(component.Name))
+                {
+                    excludedCount++;
+                    _logger.LogDebug("Excluded package: {PackageName}", component.Name);
+                }
+                else
+                {
+                    components.Add(component);
+                }
+            }
+
+            summary.ExcludedPackages = excludedCount;
+
+            if (excludedCount > 0)
+            {
+                _logger.LogInformation("Excluded {Count} packages based on configured patterns", excludedCount);
+            }
+
+            if (components.Count == 0)
+            {
+                _logger.LogWarning("All components were excluded - no licenses to download");
+                return summary;
+            }
+
+            _logger.LogInformation("Processing {Count} components (after exclusions)", components.Count);
 
             // Step 2: Download licenses
             _logger.LogInformation("Step 2: Downloading licenses...");
@@ -99,8 +134,10 @@ public class LicenseDownloadOrchestrator
             summary.OutputDirectory = stats.OutputDirectory;
 
             _logger.LogInformation("=== Download Process Complete ===");
-            _logger.LogInformation("Successful: {Success}/{Total}", summary.SuccessfulDownloads, summary.TotalComponents);
-            _logger.LogInformation("Failed: {Failed}/{Total}", summary.FailedDownloads, summary.TotalComponents);
+            _logger.LogInformation("Total components: {Total}", summary.TotalComponents);
+            _logger.LogInformation("Excluded packages: {Excluded}", summary.ExcludedPackages);
+            _logger.LogInformation("Successful downloads: {Success}", summary.SuccessfulDownloads);
+            _logger.LogInformation("Failed downloads: {Failed}", summary.FailedDownloads);
             _logger.LogInformation("Total files: {Files}, Total size: {Size}",
                 summary.TotalFilesCreated, stats.TotalSizeFormatted);
 
@@ -130,6 +167,7 @@ public class DownloadSummary
 {
     public string SbomPath { get; set; } = string.Empty;
     public int TotalComponents { get; set; }
+    public int ExcludedPackages { get; set; }
     public int SuccessfulDownloads { get; set; }
     public int FailedDownloads { get; set; }
     public int TotalFilesCreated { get; set; }
