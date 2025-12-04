@@ -229,31 +229,6 @@ Log Levels:
 - `Error` - Errors
 - `Critical` - Critical errors
 
-## Project Structure
-
-```
-SBOM.Licenses/
-├── src/
-│   └── SBOM.Licenses/
-│       ├── Configuration/
-│       │   └── LicenseDownloaderConfig.cs
-│       ├── Models/
-│       │   ├── SbomComponent.cs
-│       │   └── CycloneDxModels.cs
-│       ├── Services/
-│       │   ├── SbomReader.cs
-│       │   ├── LicenseDownloader.cs
-│       │   ├── LicenseFileManager.cs
-│       │   └── LicenseDownloadOrchestrator.cs
-│       ├── Program.cs
-│       ├── appsettings.json
-│       └── SBOM.Licenses.csproj
-├── examples/
-│   └── example-sbom.json
-├── LICENSE
-└── README.md
-```
-
 ## Generating SBOM Files
 
 To generate an SBOM file for your .NET project, you can use the following tools:
@@ -292,74 +267,13 @@ dotnet CycloneDX ./YourProject.csproj -o ./sbom.json
 - The package doesn't contain a standard license file
 - Try specifying a license URL in the SBOM
 
-## Development
-
-### Running Tests
-
-```bash
-cd src/SBOM.Licenses
-dotnet test
-```
-
-### Building from Source
-
-```bash
-# Build the project
-dotnet build
-
-# Pack as NuGet package
-dotnet pack -c Release
-
-# Install locally for testing
-dotnet tool install --global --add-source ./bin/Release SBOM.Licenses
-```
-
-### Code Style
-
-The project uses standard .NET coding conventions.
-
-## Versioning and Releases
-
-This project uses semantic versioning with automated version calculation from git tags. See [VERSIONING.md](VERSIONING.md) for detailed information about:
-
-- How versioning works
-- Creating releases
-- CI/CD pipeline
-- Publishing to NuGet
-
-### Quick Release Guide
-
-To create a new release:
-
-```bash
-# Tag the release
-git tag v1.0.0
-git push origin v1.0.0
-
-# GitHub Actions will automatically:
-# 1. Build the project
-# 2. Create NuGet package
-# 3. Publish to NuGet.org
-# 4. Create GitHub release
-```
-
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Contributing
 
-Contributions are welcome! Please create a pull request or open an issue.
-
-## Roadmap
-
-- [ ] Full SPDX format support
-- [ ] Support for additional package sources (npm, Maven, PyPI)
-- [ ] GUI version
-- [ ] Docker container
-- [ ] Parallel downloads with configurable concurrency
-- [ ] Caching of previously downloaded licenses
-- [ ] Export reports (CSV, JSON, HTML)
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to this project.
 
 ## Support
 
