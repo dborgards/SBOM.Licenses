@@ -53,14 +53,15 @@ public class LicenseDownloadOrchestrator
             _logger.LogInformation("Found {Count} components in SBOM", allComponents.Count);
 
             // Filter out excluded packages in a single pass
-            var excludedComponents = new List<Models.SbomComponent>();
             var components = new List<Models.SbomComponent>();
+            var excludedCount = 0;
 
             foreach (var component in allComponents)
             {
                 if (_exclusionService.IsExcluded(component.Name))
                 {
-                    excludedComponents.Add(component);
+                    excludedCount++;
+                    _logger.LogDebug("Excluded package: {PackageName}", component.Name);
                 }
                 else
                 {
@@ -68,15 +69,11 @@ public class LicenseDownloadOrchestrator
                 }
             }
 
-            summary.ExcludedPackages = excludedComponents.Count;
+            summary.ExcludedPackages = excludedCount;
 
-            if (excludedComponents.Count > 0)
+            if (excludedCount > 0)
             {
-                _logger.LogInformation("Excluded {Count} packages based on configured patterns:", excludedComponents.Count);
-                foreach (var excluded in excludedComponents)
-                {
-                    _logger.LogDebug("  - {PackageName} (excluded)", excluded.Name);
-                }
+                _logger.LogInformation("Excluded {Count} packages based on configured patterns", excludedCount);
             }
 
             if (components.Count == 0)
