@@ -196,20 +196,20 @@ public class SbomReader
                 }
 
                 // Look for VCS/repository URL
+                // SPDX 2.3: VCS references should have ReferenceCategory 'OTHER' and ReferenceType in known VCS types
+                var knownVcsTypes = new[] { "git", "svn", "hg", "bzr", "cvs", "mercurial" };
                 var vcsRef = package.ExternalRefs
-                    .FirstOrDefault(r => r.ReferenceCategory?.Equals("PERSISTENT-ID", StringComparison.OrdinalIgnoreCase) == true &&
-                                        (r.ReferenceType?.Contains("git", StringComparison.OrdinalIgnoreCase) == true ||
-                                         r.ReferenceType?.Contains("vcs", StringComparison.OrdinalIgnoreCase) == true));
+                    .FirstOrDefault(r => r.ReferenceCategory?.Equals("OTHER", StringComparison.OrdinalIgnoreCase) == true &&
+                                         r.ReferenceType != null &&
+                                         knownVcsTypes.Any(t => r.ReferenceType.Equals(t, StringComparison.OrdinalIgnoreCase)));
 
                 if (vcsRef?.ReferenceLocator != null)
                 {
                     sbomComponent.RepositoryUrl = vcsRef.ReferenceLocator;
                 }
-                // Alternative: check downloadLocation for git URLs
+                // Alternative: check downloadLocation for git/repository URLs
                 else if (!string.IsNullOrEmpty(package.DownloadLocation) &&
-                        (package.DownloadLocation.Contains("github.com") ||
-                         package.DownloadLocation.Contains("gitlab.com") ||
-                         package.DownloadLocation.Contains(".git")))
+                        IsRepositoryUrl(package.DownloadLocation))
                 {
                     sbomComponent.RepositoryUrl = package.DownloadLocation;
                 }
@@ -220,5 +220,44 @@ public class SbomReader
 
         _logger.LogInformation("Parsed {Count} packages from SPDX SBOM", components.Count);
         return Task.FromResult(components);
+    }
+
+    /// <summary>
+    /// Checks if a URL is a valid repository URL from known Git hosting services
+    /// </summary>
+    private static bool IsRepositoryUrl(string url)
+    {
+        if (string.IsNullOrEmpty(url))
+            return false;
+
+        // Known Git hosting platforms
+        var gitHostingDomains = new[]
+        {
+            "github.com",
+            "gitlab.com",
+            "bitbucket.org",
+            "dev.azure.com",
+            "visualstudio.com",
+            "codeberg.org",
+            "gitea.com",
+            "sourceforge.net",
+            "launchpad.net"
+        };
+
+        // Check if URL contains any known Git hosting domain
+        if (gitHostingDomains.Any(domain => url.Contains(domain, StringComparison.OrdinalIgnoreCase)))
+            return true;
+
+        // Check for .git extension (common for self-hosted repositories)
+        if (url.EndsWith(".git", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        // Check for git:// or git+https:// protocol
+        if (url.StartsWith("git://", StringComparison.OrdinalIgnoreCase) ||
+            url.StartsWith("git+https://", StringComparison.OrdinalIgnoreCase) ||
+            url.StartsWith("git+ssh://", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
     }
 }
