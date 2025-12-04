@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/dborgards/SBOM.Licenses/compare/v1.1.0...v1.2.0) (2025-12-04)
+
+
+### Features
+
+* add GitHub API integration for license downloads ([85a8327](https://github.com/dborgards/SBOM.Licenses/commit/85a83276a23faa31c149f5e46e2a469ac8c30ed4))
+
 # [1.1.0](https://github.com/dborgards/SBOM.Licenses/compare/v1.0.0...v1.1.0) (2025-12-04)
 
 
