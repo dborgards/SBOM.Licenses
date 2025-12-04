@@ -10,6 +10,7 @@ A .NET tool that automatically reads SBOM (Software Bill of Materials) files and
 - ✅ Smart file naming: `PackageName-Version.extension`
 - ✅ Configurable output directory
 - ✅ Preserves original file extensions (or uses `.txt` as fallback)
+- ✅ **Package exclusion patterns** - Skip framework packages (e.g., `Microsoft.*`, `System.*`)
 - ✅ Comprehensive logging
 - ✅ Configuration via `appsettings.json` or command-line arguments
 - ✅ Install globally as a .NET tool (like `cyclonedx`)
@@ -81,7 +82,11 @@ Create an `appsettings.json` in your working directory:
     "SbomPath": "./sbom.json",
     "CreateOutputDirectoryIfNotExists": true,
     "OverwriteExistingFiles": false,
-    "DefaultFileExtension": ".txt"
+    "DefaultFileExtension": ".txt",
+    "ExcludedPackagePatterns": [
+      "Microsoft.*",
+      "System.*"
+    ]
   }
 }
 ```
@@ -101,6 +106,30 @@ sbom-licenses
 | `CreateOutputDirectoryIfNotExists` | Automatically create output directory | `true` |
 | `OverwriteExistingFiles` | Overwrite existing files | `false` |
 | `DefaultFileExtension` | File extension for licenses without extension | `.txt` |
+| `ExcludedPackagePatterns` | List of package name patterns to exclude (supports wildcards `*` and `?`) | `["Microsoft.*", "System.*"]` |
+
+### Package Exclusion Patterns
+
+You can exclude packages from license download using wildcard patterns. This is useful for framework packages that don't require separate license files:
+
+```json
+{
+  "LicenseDownloader": {
+    "ExcludedPackagePatterns": [
+      "Microsoft.*",           // Excludes all Microsoft.* packages
+      "System.*",              // Excludes all System.* packages
+      "MyCompany.Internal.*",  // Excludes internal packages
+      "Specific.Package"       // Excludes a specific package
+    ]
+  }
+}
+```
+
+**Supported wildcards:**
+- `*` - Matches any number of characters (e.g., `Microsoft.*` matches `Microsoft.Extensions.Logging`)
+- `?` - Matches a single character (e.g., `Test?.Package` matches `Test1.Package`)
+
+Pattern matching is **case-insensitive** and **culture-invariant**.
 
 ## SBOM Format Support
 
@@ -177,13 +206,16 @@ Configuration:
   Output Directory: ./licenses
   Default Extension: .txt
   Overwrite Existing: False
+  Excluded Patterns: Microsoft.*, System.*
 
 === Starting License Download Process ===
 SBOM Path: ./sbom.json
 Step 1: Reading SBOM...
 Detected CycloneDX format
-Parsed 25 components from CycloneDX SBOM
-Found 25 components in SBOM
+Parsed 50 components from CycloneDX SBOM
+Found 50 components in SBOM
+Excluded 25 packages based on configured patterns
+Processing 25 components (after exclusions)
 
 Step 2: Downloading licenses...
 Found license file in NuGet package: LICENSE.txt
@@ -191,13 +223,16 @@ Saved license file: ./licenses/Newtonsoft.Json-13.0.3.txt
 ...
 
 === Download Process Complete ===
-Successful: 23/25
-Failed: 2/25
+Total components: 50
+Excluded packages: 25
+Successful downloads: 23
+Failed downloads: 2
 Total files: 23, Total size: 145.32 KB
 
 =====================================
 Summary:
-  Total Components: 25
+  Total Components: 50
+  Excluded Packages: 25
   Successful Downloads: 23
   Failed Downloads: 2
   Output Directory: ./licenses
@@ -244,6 +279,7 @@ SBOM.Licenses/
 │       │   ├── SbomReader.cs
 │       │   ├── LicenseDownloader.cs
 │       │   ├── LicenseFileManager.cs
+│       │   ├── PackageExclusionService.cs
 │       │   └── LicenseDownloadOrchestrator.cs
 │       ├── Program.cs
 │       ├── appsettings.json
