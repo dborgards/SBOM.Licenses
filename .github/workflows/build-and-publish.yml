@@ -35,7 +35,6 @@ jobs:
 
     - name: Test
       run: dotnet test --configuration Release --no-build --verbosity normal
-      continue-on-error: true
 
   release:
     name: Semantic Release
