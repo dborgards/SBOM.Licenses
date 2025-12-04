@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/dborgards/SBOM.Licenses/compare/v1.2.0...v1.3.0) (2025-12-04)
+
+
+### Bug Fixes
+
+* improve SPDX reference extraction accuracy and prevent false positives ([338f3e2](https://github.com/dborgards/SBOM.Licenses/commit/338f3e230fdb956e26daa45b02f2e238297e314d))
+
+
+### Features
+
+* add SPDX SBOM format support ([9818fdb](https://github.com/dborgards/SBOM.Licenses/commit/9818fdb45cd61325b57b3e6b2afe9a6d77b63bca))
+
 # [1.2.0](https://github.com/dborgards/SBOM.Licenses/compare/v1.1.0...v1.2.0) (2025-12-04)
 
 
