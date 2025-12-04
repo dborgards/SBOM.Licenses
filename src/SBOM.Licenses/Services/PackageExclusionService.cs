@@ -52,7 +52,7 @@ public class PackageExclusionService
             // Ensure exact match (anchor at start and end)
             regexPattern = $"^{regexPattern}$";
 
-            return new Regex(regexPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            return new Regex(regexPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
         });
     }
 }
