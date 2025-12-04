@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using SBOM.Licenses.Configuration;
 
@@ -8,6 +9,9 @@ namespace SBOM.Licenses.Services;
 /// </summary>
 public class PackageExclusionService
 {
+    // Static cache to avoid recompiling the same regex patterns across service instances
+    private static readonly ConcurrentDictionary<string, Regex> _regexCache = new();
+
     private readonly List<Regex> _exclusionRegexes;
 
     public PackageExclusionService(LicenseDownloaderConfig config)
@@ -33,18 +37,22 @@ public class PackageExclusionService
     }
 
     /// <summary>
-    /// Converts a wildcard pattern (e.g., "Microsoft.*") to a regex pattern
+    /// Converts a wildcard pattern (e.g., "Microsoft.*") to a regex pattern.
+    /// Uses a static cache to avoid recompiling identical patterns.
     /// </summary>
     private static Regex ConvertWildcardToRegex(string wildcardPattern)
     {
-        // Escape special regex characters except * and ?
-        var regexPattern = Regex.Escape(wildcardPattern)
-            .Replace("\\*", ".*")  // * matches any characters
-            .Replace("\\?", ".");  // ? matches single character
+        return _regexCache.GetOrAdd(wildcardPattern, pattern =>
+        {
+            // Escape special regex characters except * and ?
+            var regexPattern = Regex.Escape(pattern)
+                .Replace("\\*", ".*")  // * matches any characters
+                .Replace("\\?", ".");  // ? matches single character
 
-        // Ensure exact match (anchor at start and end)
-        regexPattern = $"^{regexPattern}$";
+            // Ensure exact match (anchor at start and end)
+            regexPattern = $"^{regexPattern}$";
 
-        return new Regex(regexPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            return new Regex(regexPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        });
     }
 }

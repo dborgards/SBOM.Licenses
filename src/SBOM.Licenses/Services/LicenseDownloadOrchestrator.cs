@@ -52,14 +52,21 @@ public class LicenseDownloadOrchestrator
 
             _logger.LogInformation("Found {Count} components in SBOM", allComponents.Count);
 
-            // Filter out excluded packages
-            var excludedComponents = allComponents
-                .Where(c => _exclusionService.IsExcluded(c.Name))
-                .ToList();
+            // Filter out excluded packages in a single pass
+            var excludedComponents = new List<Models.SbomComponent>();
+            var components = new List<Models.SbomComponent>();
 
-            var components = allComponents
-                .Where(c => !_exclusionService.IsExcluded(c.Name))
-                .ToList();
+            foreach (var component in allComponents)
+            {
+                if (_exclusionService.IsExcluded(component.Name))
+                {
+                    excludedComponents.Add(component);
+                }
+                else
+                {
+                    components.Add(component);
+                }
+            }
 
             summary.ExcludedPackages = excludedComponents.Count;
 
