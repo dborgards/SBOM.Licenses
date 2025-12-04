@@ -27,7 +27,7 @@
     [
       "@semantic-release/exec",
       {
-        "prepareCmd": "dotnet pack src/SBOM.Licenses/SBOM.Licenses.csproj --configuration Release -p:Version=${nextRelease.version} --output ./artifacts"
+        "prepareCmd": "dotnet pack ${PROJECT_PATH} --configuration Release -p:Version=${nextRelease.version} --output ./artifacts"
       }
     ],
     [
