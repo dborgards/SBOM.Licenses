@@ -87,7 +87,7 @@ public class GitHubLicenseService
                 "Successfully retrieved license from GitHub: {Owner}/{Repo} (SPDX: {SpdxId})",
                 repoInfo.Value.Owner,
                 repoInfo.Value.Repo,
-                licenseResponse.License?.SpdxId);
+                licenseResponse.License?.SpdxId ?? "unknown");
 
             return new GitHubLicenseResult
             {
@@ -137,7 +137,7 @@ public class GitHubLicenseService
             // Remove git@ prefix for SSH URLs
             if (url.StartsWith("git@github.com:", StringComparison.OrdinalIgnoreCase))
             {
-                url = "https://github.com/" + url.Substring("git@github.com:".Length);
+                url = "https://github.com/" + url["git@github.com:".Length..];
             }
 
             // Add https:// if missing
@@ -168,7 +168,7 @@ public class GitHubLicenseService
             // Remove .git suffix if present
             if (repo.EndsWith(".git", StringComparison.OrdinalIgnoreCase))
             {
-                repo = repo.Substring(0, repo.Length - 4);
+                repo = repo[..^4];
             }
 
             return (owner, repo);
