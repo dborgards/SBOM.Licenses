@@ -188,7 +188,8 @@ public class SbomReader
             {
                 // Look for package-manager reference (purl)
                 var purlRef = package.ExternalRefs
-                    .FirstOrDefault(r => r.ReferenceType?.Equals("purl", StringComparison.OrdinalIgnoreCase) == true);
+                    .FirstOrDefault(r => r.ReferenceType?.Equals("purl", StringComparison.OrdinalIgnoreCase) == true
+                                        && r.ReferenceCategory?.Equals("PACKAGE-MANAGER", StringComparison.OrdinalIgnoreCase) == true);
 
                 if (purlRef?.ReferenceLocator != null)
                 {
@@ -197,7 +198,7 @@ public class SbomReader
 
                 // Look for VCS/repository URL
                 // SPDX 2.3: VCS references should have ReferenceCategory 'OTHER' and ReferenceType in known VCS types
-                var knownVcsTypes = new[] { "git", "svn", "hg", "bzr", "cvs", "mercurial" };
+                var knownVcsTypes = new[] { "git", "svn", "hg", "bzr", "cvs" };
                 var vcsRef = package.ExternalRefs
                     .FirstOrDefault(r => r.ReferenceCategory?.Equals("OTHER", StringComparison.OrdinalIgnoreCase) == true &&
                                          r.ReferenceType != null &&
@@ -244,8 +245,11 @@ public class SbomReader
             "launchpad.net"
         };
 
-        // Check if URL contains any known Git hosting domain
-        if (gitHostingDomains.Any(domain => url.Contains(domain, StringComparison.OrdinalIgnoreCase)))
+        // Check if URL host matches any known Git hosting domain
+        if (Uri.TryCreate(url, UriKind.Absolute, out var uri) &&
+            gitHostingDomains.Any(domain =>
+                uri.Host.Equals(domain, StringComparison.OrdinalIgnoreCase) ||
+                uri.Host.EndsWith("." + domain, StringComparison.OrdinalIgnoreCase)))
             return true;
 
         // Check for .git extension (common for self-hosted repositories)
