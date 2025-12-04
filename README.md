@@ -211,9 +211,49 @@ The application supports CycloneDX SBOM files in JSON format:
 
 The `externalReferences` field with `type: "vcs"` enables GitHub API integration for faster license downloads.
 
-### SPDX (In Development)
+### SPDX (Fully Supported)
 
-SPDX format support is under development.
+The application fully supports SPDX 2.3 SBOM files in JSON format:
+
+```json
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "Example SPDX SBOM",
+  "documentNamespace": "https://example.org/sbom/example-1.0.0",
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-Newtonsoft.Json",
+      "name": "Newtonsoft.Json",
+      "versionInfo": "13.0.3",
+      "downloadLocation": "https://github.com/JamesNK/Newtonsoft.Json",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:nuget/Newtonsoft.Json@13.0.3"
+        },
+        {
+          "referenceCategory": "OTHER",
+          "referenceType": "git",
+          "referenceLocator": "https://github.com/JamesNK/Newtonsoft.Json"
+        }
+      ]
+    }
+  ]
+}
+```
+
+**SPDX-specific features:**
+- Extracts licenses from `licenseConcluded`, `licenseDeclared`, or `licenseInfoFromFiles`
+- Automatically filters SPDX special values (`NOASSERTION`, `NONE`)
+- Supports package URLs (purl) via `externalRefs` with category `PACKAGE-MANAGER`
+- Extracts repository URLs from `externalRefs` with category `OTHER` and VCS types (git, svn, hg, bzr, cvs)
+- Falls back to `downloadLocation` for repository detection
+- Supports GitHub API integration via repository URLs
 
 ## File Naming Convention
 

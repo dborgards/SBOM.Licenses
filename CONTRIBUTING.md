@@ -12,18 +12,22 @@ SBOM.Licenses/
 │       │   └── LicenseDownloaderConfig.cs
 │       ├── Models/
 │       │   ├── SbomComponent.cs
-│       │   └── CycloneDxModels.cs
+│       │   ├── CycloneDxModels.cs
+│       │   └── SpdxModels.cs
 │       ├── Services/
 │       │   ├── SbomReader.cs
 │       │   ├── LicenseDownloader.cs
 │       │   ├── LicenseFileManager.cs
+│       │   ├── GitHubLicenseService.cs
 │       │   ├── PackageExclusionService.cs
 │       │   └── LicenseDownloadOrchestrator.cs
 │       ├── Program.cs
 │       ├── appsettings.json
 │       └── SBOM.Licenses.csproj
 ├── examples/
-│   └── example-sbom.json
+│   ├── example-sbom.json
+│   ├── example-spdx-sbom.json
+│   └── test-github-sbom.json
 ├── LICENSE
 ├── README.md
 └── CONTRIBUTING.md
@@ -89,6 +93,52 @@ dotnet tool install --global --add-source ./bin/Release SBOM.Licenses
 # Test with example SBOM
 sbom-licenses ./examples/example-sbom.json
 ```
+
+## Architecture Overview
+
+### SBOM Format Support
+
+The application supports multiple SBOM formats through a unified architecture:
+
+1. **Format-Specific Models** (`Models/CycloneDxModels.cs`, `Models/SpdxModels.cs`)
+   - Define C# classes that match the JSON structure of each SBOM format
+   - Use `System.Text.Json.Serialization` attributes for JSON mapping
+
+2. **Universal Component Model** (`Models/SbomComponent.cs`)
+   - All SBOM formats are converted to this normalized internal representation
+   - Contains: Name, Version, Licenses, PackageUrl, RepositoryUrl
+
+3. **Format Detection & Parsing** (`Services/SbomReader.cs`)
+   - Auto-detects SBOM format by checking for format-specific properties
+   - Each format has its own parser method (e.g., `ParseCycloneDxAsync`, `ParseSpdxAsync`)
+   - Converts format-specific models to `SbomComponent` list
+
+4. **Format-Agnostic Processing**
+   - Once converted to `SbomComponent`, all downstream services work identically
+   - `LicenseDownloader`, `GitHubLicenseService`, `LicenseFileManager` are format-agnostic
+
+### Adding a New SBOM Format
+
+To add support for a new SBOM format:
+
+1. Create format-specific models in `Models/YourFormatModels.cs`
+2. Add format detection logic in `SbomReader.ReadSbomAsync()`
+3. Implement `ParseYourFormatAsync()` method in `SbomReader`
+4. Convert to `SbomComponent` objects
+5. Add example SBOM file in `examples/`
+6. Update documentation (README.md, CONTRIBUTING.md)
+
+### SPDX Implementation Example
+
+The SPDX implementation serves as a reference for adding new formats:
+
+- **Models**: `SpdxDocument`, `SpdxPackage`, `SpdxExternalRef` (in `SpdxModels.cs`)
+- **License Extraction**: Priority order: `licenseConcluded` → `licenseDeclared` → `licenseInfoFromFiles`
+- **Special Values**: Filters out `NOASSERTION` and `NONE`
+- **External References**:
+  - Package URLs (purl): `referenceCategory: "PACKAGE-MANAGER"`, `referenceType: "purl"`
+  - VCS URLs: `referenceCategory: "OTHER"`, `referenceType` in known VCS types (git, svn, hg, bzr, cvs)
+- **URL Validation**: Uses URI parsing to prevent false positives in domain matching
 
 ## Code Style
 
@@ -161,7 +211,7 @@ git push origin v1.0.0
 
 The following features and improvements are planned:
 
-- [ ] Full SPDX format support
+- [x] Full SPDX format support (SPDX 2.3) ✅
 - [ ] Support for additional package sources (npm, Maven, PyPI)
 - [ ] GUI version
 - [ ] Docker container
