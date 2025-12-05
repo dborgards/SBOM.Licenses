@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/dborgards/SBOM.Licenses/compare/v1.3.0...v1.3.1) (2025-12-05)
+
+
+### Bug Fixes
+
+* correct GitHub Actions badge URLs in README ([6a8eb3e](https://github.com/dborgards/SBOM.Licenses/commit/6a8eb3edf283c750bef9b87b910c5e272cb37f54))
+
 # [1.3.0](https://github.com/dborgards/SBOM.Licenses/compare/v1.2.0...v1.3.0) (2025-12-04)
 
 
