@@ -2,8 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
 [![NuGet](https://img.shields.io/nuget/v/SBOM.Licenses.svg)](https://www.nuget.org/packages/SBOM.Licenses/)
-[![CI](https://github.com/dborgards/SBOM.Licenses/actions/workflows/ci.yml/badge.svg)](https://github.com/dborgards/SBOM.Licenses/actions/workflows/ci.yml)
-[![Release](https://github.com/dborgards/SBOM.Licenses/actions/workflows/release.yml/badge.svg)](https://github.com/dborgards/SBOM.Licenses/actions/workflows/release.yml)
+[![Build and Release](https://github.com/dborgards/SBOM.Licenses/actions/workflows/build-and-publish.yml/badge.svg)](https://github.com/dborgards/SBOM.Licenses/actions/workflows/build-and-publish.yml)
 
 A .NET tool that automatically reads SBOM (Software Bill of Materials) files and downloads the contained license files from the original packages.
 
