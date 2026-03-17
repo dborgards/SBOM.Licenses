@@ -5,6 +5,8 @@
     <TargetFrameworks>net8.0;net10.0;net48</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!-- C# 8+ required for Nullable; net48 defaults to 7.3 -->
+    <LangVersion>latest</LangVersion>
     <AssemblyName>sbom-licenses</AssemblyName>
     <RootNamespace>SBOM.Licenses</RootNamespace>
 
