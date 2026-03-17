@@ -22,7 +22,9 @@ A .NET tool that automatically reads SBOM (Software Bill of Materials) files and
 
 ## Requirements
 
-- .NET 8.0 SDK or higher
+- **To build from source:** .NET 8.0 SDK or higher (.NET 10 SDK optional for `net10.0`).
+- **To run:** .NET 8+ or .NET 10 (install as global tool or run the built app).
+- The project multi-targets **net8.0** and **net10.0**.
 
 ## Installation
 
