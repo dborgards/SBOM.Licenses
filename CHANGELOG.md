@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/dborgards/SBOM.Licenses/compare/v1.3.1...v1.4.0) (2026-03-17)
+
+
+### Features
+
+* **build:** multi-target net8.0, net10.0 ([#14](https://github.com/dborgards/SBOM.Licenses/issues/14)) ([a3c9ea5](https://github.com/dborgards/SBOM.Licenses/commit/a3c9ea5b27696620d28987159cb3f7920dece903))
+
 ## [1.3.1](https://github.com/dborgards/SBOM.Licenses/compare/v1.3.0...v1.3.1) (2025-12-05)
 
 
