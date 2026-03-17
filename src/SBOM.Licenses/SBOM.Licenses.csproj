@@ -15,8 +15,7 @@
 
     <!-- NuGet Package Metadata -->
     <PackageId>SBOM.Licenses</PackageId>
-    <Authors>SBOM.Licenses Contributors</Authors>
-    <Company>SBOM.Licenses</Company>
+    <Authors>Dietmar Borgards</Authors>
     <Product>SBOM License Downloader</Product>
     <Description>A .NET tool that automatically downloads license files from NuGet packages listed in SBOM (Software Bill of Materials) files. Supports CycloneDX format and extracts licenses directly from packages.</Description>
     <PackageTags>sbom;licenses;cyclonedx;nuget;tool;dotnet-tool</PackageTags>
